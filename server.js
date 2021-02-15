@@ -44,10 +44,30 @@ app.post("/api/users/register", (req, res) => {
 
 app.post("/api/user/login", (req, res) => {
   //find the email
-
+    User.findOne({ email: req.body.email }, (error, user) => {
+        if(!user)
+        return res.join({
+            loginSucess: false,
+            message: "Authentication failed, email not found"
+        });
   //comparePassword
-
+    User.comparePassword(req.body.password, (error, isMatch) => {
+        if(!isMatch){
+            return res.json ({ loginSucess: false, message: "incorrect password"})
+        }
+    })
   //generateToken
+    User.generateToken((error, user) => {
+        if(error) return res.status(400).send(error);
+        res.cookie("x_authentication", user.token)
+            .status(200)
+            .json({
+              loginSucess: true
+            })
+    })
+    })
+
+
 })
 
 
