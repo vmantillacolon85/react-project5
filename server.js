@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
 
 const config = require("./config/key.js")
 
@@ -32,14 +33,22 @@ app.get('/', (req, res) => {
 
 app.post("/api/users/register", (req, res) => {
     const user = new User(req.body)
+
     user.save((error, userData) => {
         if (error) return res.json ({ success: false, error })
         return res.status(200).json({
             success: true
-            })
         })
+    })
 });
 
+app.post("/api/user/login", (req, res) => {
+  //find the email
+
+  //comparePassword
+
+  //generateToken
+})
 
 
 
