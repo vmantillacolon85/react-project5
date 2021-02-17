@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 const config = require("./config/key.js")
 
 const { User } = require("./models/user.js");
+const { auth } = require("./middleware/auth.js")
 
 mongoose.connect(config.mongoURI,
 {useNewUrlParser: true }).then(() =>console.log("DB connected"))
@@ -25,11 +26,20 @@ app.use(cookieParser());
 //     res.send("hello world")
 // });
 
-app.get('/', (req, res) => {
-    res.json({"hello world": "hi bitch"})
-});
+// app.get('/', (req, res) => {
+//     res.json({"hello world": "hi there"})
+// });
 
-
+app.get("/api/user/auth", auth, (req, res) =>{
+    res.status(200).json({
+      _id: req._id,
+      isAuth: true,
+      email: req.user.email,
+      name: req.user.name,
+      lastName: req.user.lastName,
+      role: req.user.role
+    })
+})
 
 app.post("/api/users/register", (req, res) => {
     const user = new User(req.body)
@@ -53,20 +63,19 @@ app.post("/api/user/login", (req, res) => {
   //comparePassword
     User.comparePassword(req.body.password, (error, isMatch) => {
         if(!isMatch){
-            return res.json ({ loginSucess: false, message: "incorrect password"})
+            return res.json({ loginSucess: false, message: "incorrect password"})
         }
     })
   //generateToken
     User.generateToken((error, user) => {
         if(error) return res.status(400).send(error);
-        res.cookie("x_authentication", user.token)
+        res.cookie("x_auth", user.token)
             .status(200)
             .json({
               loginSucess: true
             })
     })
     })
-
 
 })
 
